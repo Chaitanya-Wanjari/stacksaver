@@ -32,16 +32,17 @@ export async function sendAuditEmail({
   const reportUrl = `${appUrl}/audit/${result.publicId}`;
 
   return resend.emails.send({
-    from: "StackSaver <onboarding@resend.dev>",
-    to,
-    subject: `Your AI spend audit: $${result.totalAnnualSavings}/year potential savings`,
-    html: `
-      <h1>Your StackSaver audit is ready</h1>
-      <p>Your audit found <strong>$${result.totalMonthlySavings}/month</strong> in potential savings.</p>
-      <p>That is <strong>$${result.totalAnnualSavings}/year</strong>.</p>
-      <h2>Top recommendations</h2>
-      <ul>${topRecommendations || "<li>Your stack appears lean.</li>"}</ul>
-      <p><a href="${reportUrl}">View your public report</a></p>
-    `,
-  });
+  from: "StackSaver <audit@hireflowai.in>",
+  to,
+  replyTo: "imt_2022034@iiitm.ac.in",
+  subject: `Your AI spend audit: $${result.totalAnnualSavings}/year potential savings`,
+  html: `
+    <h1>Your StackSaver audit is ready</h1>
+    <p>Your audit found <strong>$${result.totalMonthlySavings}/month</strong> in potential savings.</p>
+    <p>That is <strong>$${result.totalAnnualSavings}/year</strong>.</p>
+    <h2>Top recommendations</h2>
+    <ul>${topRecommendations || "<li>Your stack appears lean.</li>"}</ul>
+    <p><a href="${reportUrl}">View your public report</a></p>
+  `,
+});
 }

@@ -1,103 +1,295 @@
+import {
+  ArrowRight,
+  BarChart3,
+  CheckCircle2,
+  Lock,
+  Mail,
+  ShieldCheck,
+  Sparkles,
+  TrendingDown,
+  Zap,
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
+import { ThemeToggle } from "@/components/theme-toggle";
+
+const supportedTools = [
+  "Cursor",
+  "GitHub Copilot",
+  "Claude",
+  "ChatGPT",
+  "OpenAI API",
+  "Anthropic API",
+  "Gemini",
+  "Windsurf",
+  "v0",
+];
 
 export default function Home() {
   return (
-    <main className="min-h-screen bg-background">
-      <section className="mx-auto max-w-6xl px-4 py-10 md:py-16">
-        <nav className="mb-16 flex items-center justify-between">
-          <a href="/" className="text-xl font-bold">
+    <main className="min-h-screen overflow-hidden">
+      <section className="mx-auto max-w-7xl px-4 py-6 md:py-8">
+        <nav className="flex items-center justify-between rounded-2xl border bg-background/70 px-4 py-3 shadow-sm backdrop-blur">
+          <a href="/" className="flex items-center gap-2 font-bold">
+            <span className="flex size-8 items-center justify-center rounded-xl bg-foreground text-background">
+              S
+            </span>
             StackSaver
           </a>
 
-          <Button asChild>
-            <a href="/audit/new">Run free audit</a>
-          </Button>
+          <div className="hidden items-center gap-6 text-sm text-muted-foreground md:flex">
+            <a href="#features" className="hover:text-foreground">
+              Features
+            </a>
+            <a href="#how-it-works" className="hover:text-foreground">
+              How it works
+            </a>
+            <a href="#tools" className="hover:text-foreground">
+              Tools
+            </a>
+          </div>
+
+          <div className="flex items-center gap-2">
+  <ThemeToggle />
+  <Button asChild>
+    <a href="/audit/new">
+      Run free audit <ArrowRight className="ml-2 size-4" />
+    </a>
+  </Button>
+</div>
         </nav>
 
-        <div className="grid gap-10 md:grid-cols-[1.1fr_0.9fr] md:items-center">
+        <div className="grid gap-10 py-16 md:grid-cols-[1.05fr_0.95fr] md:items-center md:py-24">
           <div>
-            <p className="mb-3 text-sm font-medium text-muted-foreground">
-              AI Spend Audit for startup teams
-            </p>
+            <div className="mb-5 inline-flex items-center gap-2 rounded-full border bg-background/70 px-3 py-1 text-sm text-muted-foreground shadow-sm backdrop-blur">
+              <Sparkles className="size-4" />
+              AI spend audit for startup teams
+            </div>
 
-            <h1 className="text-5xl font-bold tracking-tight md:text-6xl">
-              Find leaks in your AI spend.
+            <h1 className="max-w-4xl text-5xl font-bold tracking-tight md:text-7xl">
+              Find leaks in your AI tool spend.
             </h1>
 
-            <p className="mt-5 max-w-2xl text-lg text-muted-foreground">
-              Audit Cursor, Copilot, Claude, ChatGPT, Gemini, Windsurf, and API
-              costs in minutes. Find unused seats, duplicate tools, and retail
-              API spend before your next billing cycle.
+            <p className="mt-6 max-w-2xl text-lg leading-8 text-muted-foreground">
+              StackSaver audits your AI subscriptions and API usage to detect
+              unused seats, duplicate tools, plan mismatch, and high retail API
+              spend before your next billing cycle.
             </p>
 
             <div className="mt-8 flex flex-col gap-3 sm:flex-row">
               <Button size="lg" asChild>
-                <a href="/audit/new">Run free audit</a>
+                <a href="/audit/new">
+                  Run free audit <ArrowRight className="ml-2 size-4" />
+                </a>
               </Button>
 
               <Button size="lg" variant="outline" asChild>
                 <a href="#how-it-works">See how it works</a>
               </Button>
             </div>
+
+            <div className="mt-8 grid gap-3 text-sm text-muted-foreground sm:grid-cols-3">
+              <TrustItem icon={<ShieldCheck className="size-4" />} text="No signup required" />
+              <TrustItem icon={<Lock className="size-4" />} text="Public report links" />
+              <TrustItem icon={<Zap className="size-4" />} text="Results in minutes" />
+            </div>
           </div>
 
-          <Card className="border shadow-sm">
-            <CardContent className="space-y-4 p-6">
-              <p className="text-sm text-muted-foreground">Example audit</p>
-              <p className="text-5xl font-bold">$740/mo</p>
-              <p className="text-muted-foreground">
-                Potential savings from unused seats, overlapping coding
-                assistants, and retail API spend.
-              </p>
+          <Card className="relative overflow-hidden border shadow-xl">
+            <div className="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-indigo-500 via-sky-500 to-emerald-500" />
+            <CardContent className="space-y-6 p-6 md:p-8">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm text-muted-foreground">
+                    Example audit
+                  </p>
+                  <h2 className="mt-1 text-2xl font-bold">Seed-stage SaaS</h2>
+                </div>
+                <div className="rounded-full bg-emerald-50 px-3 py-1 text-sm font-medium text-emerald-700">
+                  High savings
+                </div>
+              </div>
+
+              <div>
+                <p className="text-sm text-muted-foreground">
+                  Estimated savings
+                </p>
+                <p className="mt-2 text-6xl font-bold tracking-tight">
+                  $740
+                  <span className="text-xl font-medium text-muted-foreground">
+                    /mo
+                  </span>
+                </p>
+                <p className="mt-2 text-muted-foreground">
+                  $8,880/year back into runway
+                </p>
+              </div>
 
               <div className="grid gap-3">
-                <div className="rounded-xl border p-3">
-                  Cursor Business → reduce unused seats
-                </div>
-                <div className="rounded-xl border p-3">
-                  Copilot Business → consolidate duplicate assistant
-                </div>
-                <div className="rounded-xl border p-3">
-                  OpenAI API → review discounted credits
-                </div>
+                <AuditPreviewItem
+                  title="Cursor Business"
+                  text="Reduce unused seats"
+                  value="$200/mo"
+                />
+                <AuditPreviewItem
+                  title="Copilot Business"
+                  text="Consolidate duplicate assistant"
+                  value="$95/mo"
+                />
+                <AuditPreviewItem
+                  title="OpenAI API"
+                  text="Review discounted credits"
+                  value="$600/mo"
+                />
               </div>
             </CardContent>
           </Card>
         </div>
 
-        <section id="how-it-works" className="mt-20 grid gap-4 md:grid-cols-3">
+        <section id="features" className="grid gap-4 md:grid-cols-3">
           <Feature
-            title="1. Add your stack"
-            text="Enter your AI tools, plans, seats, monthly spend, and primary use case."
+            icon={<TrendingDown className="size-5" />}
+            title="Savings detection"
+            text="Find unused seats, overlapping subscriptions, plan mismatch, and high API spend."
           />
           <Feature
-            title="2. Get a defensible audit"
-            text="StackSaver uses deterministic rules and pricing data, not vague AI guesses."
+            icon={<BarChart3 className="size-5" />}
+            title="Efficiency score"
+            text="Get a simple 0–100 score that summarizes how optimized your AI stack is."
           />
           <Feature
-            title="3. Share or capture savings"
-            text="Generate a public report, email the audit, or request a review for high-savings cases."
+            icon={<Mail className="size-5" />}
+            title="Lead-ready reports"
+            text="Generate public reports and email summaries from a real Supabase-backed flow."
           />
         </section>
 
-        <section className="mt-20 rounded-2xl border p-8">
-          <h2 className="text-3xl font-bold">Supported tools</h2>
-          <p className="mt-2 text-muted-foreground">
-            Cursor, GitHub Copilot, Claude, ChatGPT, OpenAI API, Anthropic API,
-            Gemini, Windsurf, and v0.
-          </p>
+        <section
+          id="how-it-works"
+          className="mt-20 rounded-3xl border bg-background/70 p-6 shadow-sm backdrop-blur md:p-10"
+        >
+          <div className="max-w-2xl">
+            <p className="text-sm font-medium text-muted-foreground">
+              How it works
+            </p>
+            <h2 className="mt-2 text-4xl font-bold tracking-tight">
+              A finance-literate audit in three steps.
+            </h2>
+          </div>
+
+          <div className="mt-8 grid gap-4 md:grid-cols-3">
+            <Step
+              number="01"
+              title="Add your AI stack"
+              text="Enter tools, plans, seats, monthly spend, team size, and usage intensity."
+            />
+            <Step
+              number="02"
+              title="Run deterministic checks"
+              text="The engine calculates savings using explainable rules instead of hallucinated AI math."
+            />
+            <Step
+              number="03"
+              title="Share the report"
+              text="Save the audit to Supabase, generate a public URL, and capture leads."
+            />
+          </div>
+        </section>
+
+        <section id="tools" className="mt-20 pb-16">
+          <div className="rounded-3xl border bg-foreground p-8 text-background md:p-10">
+            <h2 className="text-3xl font-bold">Supported tools</h2>
+            <p className="mt-2 max-w-2xl text-background/70">
+              StackSaver supports the AI tools most startup teams already pay
+              for.
+            </p>
+
+            <div className="mt-6 flex flex-wrap gap-3">
+              {supportedTools.map((tool) => (
+                <span
+                  key={tool}
+                  className="rounded-full border border-background/15 bg-background/10 px-4 py-2 text-sm"
+                >
+                  {tool}
+                </span>
+              ))}
+            </div>
+          </div>
         </section>
       </section>
     </main>
   );
 }
 
-function Feature({ title, text }: { title: string; text: string }) {
+function TrustItem({
+  icon,
+  text,
+}: {
+  icon: React.ReactNode;
+  text: string;
+}) {
   return (
-    <div className="rounded-xl border p-5">
-      <h3 className="font-semibold">{title}</h3>
-      <p className="mt-2 text-sm text-muted-foreground">{text}</p>
+    <div className="flex items-center gap-2">
+      {icon}
+      {text}
+    </div>
+  );
+}
+
+function AuditPreviewItem({
+  title,
+  text,
+  value,
+}: {
+  title: string;
+  text: string;
+  value: string;
+}) {
+  return (
+    <div className="flex items-center justify-between rounded-2xl border bg-muted/40 p-4">
+      <div>
+        <p className="font-medium">{title}</p>
+        <p className="text-sm text-muted-foreground">{text}</p>
+      </div>
+      <p className="font-semibold text-emerald-600">{value}</p>
+    </div>
+  );
+}
+
+function Feature({
+  icon,
+  title,
+  text,
+}: {
+  icon: React.ReactNode;
+  title: string;
+  text: string;
+}) {
+  return (
+    <div className="rounded-3xl border bg-background/70 p-6 shadow-sm backdrop-blur">
+      <div className="mb-5 flex size-11 items-center justify-center rounded-2xl bg-muted">
+        {icon}
+      </div>
+      <h3 className="text-lg font-semibold">{title}</h3>
+      <p className="mt-2 text-sm leading-6 text-muted-foreground">{text}</p>
+    </div>
+  );
+}
+
+function Step({
+  number,
+  title,
+  text,
+}: {
+  number: string;
+  title: string;
+  text: string;
+}) {
+  return (
+    <div className="rounded-2xl border bg-muted/30 p-5">
+      <p className="text-sm font-semibold text-muted-foreground">{number}</p>
+      <h3 className="mt-4 font-semibold">{title}</h3>
+      <p className="mt-2 text-sm leading-6 text-muted-foreground">{text}</p>
     </div>
   );
 }

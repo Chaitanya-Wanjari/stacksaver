@@ -2,9 +2,9 @@
 
 import { useEffect, useState } from "react";
 import { nanoid } from "nanoid";
-import { runAudit } from "@/lib/audit/engine";
-import { AuditInput, AuditResult, ToolName, UseCase } from "@/lib/audit/types";
-import { PRICING, TOOL_LABELS } from "@/lib/audit/pricing";
+import { useRouter } from "next/navigation";
+import { TOOL_PRICING } from "@/lib/audit/pricing";
+import { AuditInput, ToolName, UseCase, CompanyStage } from "@/lib/audit/types";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -20,7 +20,9 @@ import {
 const STORAGE_KEY = "stacksaver-audit-draft";
 
 const defaultInput: AuditInput = {
-  teamSize: 5,
+  companyStage: "seed",
+  teamSize: 8,
+  engineeringTeamSize: 5,
   useCase: "coding",
   tools: [
     {
@@ -29,16 +31,16 @@ const defaultInput: AuditInput = {
       plan: "Pro",
       monthlySpend: 100,
       seats: 5,
+      usageIntensity: "heavy",
     },
   ],
 };
 
-interface SpendFormProps {
-  onResult: (result: AuditResult) => void;
-}
-
-export function SpendForm({ onResult }: SpendFormProps) {
+export function SpendForm() {
+  const router = useRouter();
   const [form, setForm] = useState<AuditInput>(defaultInput);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [error, setError] = useState("");
 
   useEffect(() => {
     const saved = localStorage.getItem(STORAGE_KEY);
@@ -56,18 +58,19 @@ export function SpendForm({ onResult }: SpendFormProps) {
   }, [form]);
 
   function updateTool(index: number, key: string, value: string | number) {
-    const nextTools = [...form.tools];
-    nextTools[index] = {
-      ...nextTools[index],
+    const tools = [...form.tools];
+
+    tools[index] = {
+      ...tools[index],
       [key]: value,
     };
 
     if (key === "tool") {
-      const tool = value as ToolName;
-      nextTools[index].plan = PRICING[tool][0].plan;
+      const selectedTool = value as ToolName;
+      tools[index].plan = TOOL_PRICING[selectedTool].plans[0].name;
     }
 
-    setForm({ ...form, tools: nextTools });
+    setForm({ ...form, tools });
   }
 
   function addTool() {
@@ -81,6 +84,7 @@ export function SpendForm({ onResult }: SpendFormProps) {
           plan: "Plus",
           monthlySpend: 20,
           seats: 1,
+          usageIntensity: "moderate",
         },
       ],
     });
@@ -88,16 +92,39 @@ export function SpendForm({ onResult }: SpendFormProps) {
 
   function removeTool(index: number) {
     if (form.tools.length === 1) return;
+
     setForm({
       ...form,
       tools: form.tools.filter((_, i) => i !== index),
     });
   }
 
-  function submit() {
-    const result = runAudit(form);
-    localStorage.setItem(`stacksaver-result-${result.id}`, JSON.stringify(result));
-    onResult(result);
+  async function submitAudit() {
+    setIsSubmitting(true);
+    setError("");
+
+    try {
+      const res = await fetch("/api/audits", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(form),
+      });
+
+      const data = await res.json();
+
+      if (!res.ok || !data.ok) {
+        throw new Error(data.error || "Could not create audit");
+      }
+
+      localStorage.removeItem(STORAGE_KEY);
+      router.push(`/audit/${data.publicId}`);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Something went wrong");
+    } finally {
+      setIsSubmitting(false);
+    }
   }
 
   return (
@@ -107,14 +134,51 @@ export function SpendForm({ onResult }: SpendFormProps) {
       </CardHeader>
 
       <CardContent className="space-y-6">
-        <div className="grid gap-4 md:grid-cols-2">
+        <div className="grid gap-4 md:grid-cols-4">
           <div>
-            <Label>Team size</Label>
+            <Label>Company stage</Label>
+            <Select
+              value={form.companyStage}
+              onValueChange={(value) =>
+                setForm({ ...form, companyStage: value as CompanyStage })
+              }
+            >
+              <SelectTrigger>
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="solo">Solo</SelectItem>
+                <SelectItem value="pre-seed">Pre-seed</SelectItem>
+                <SelectItem value="seed">Seed</SelectItem>
+                <SelectItem value="series-a">Series A</SelectItem>
+                <SelectItem value="growth">Growth</SelectItem>
+                <SelectItem value="agency">Agency</SelectItem>
+                <SelectItem value="other">Other</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+
+          <div>
+            <Label>Total team size</Label>
             <Input
               type="number"
               value={form.teamSize}
               onChange={(e) =>
                 setForm({ ...form, teamSize: Number(e.target.value) })
+              }
+            />
+          </div>
+
+          <div>
+            <Label>Engineering team size</Label>
+            <Input
+              type="number"
+              value={form.engineeringTeamSize}
+              onChange={(e) =>
+                setForm({
+                  ...form,
+                  engineeringTeamSize: Number(e.target.value),
+                })
               }
             />
           </div>
@@ -135,6 +199,7 @@ export function SpendForm({ onResult }: SpendFormProps) {
                 <SelectItem value="writing">Writing</SelectItem>
                 <SelectItem value="data">Data</SelectItem>
                 <SelectItem value="research">Research</SelectItem>
+                <SelectItem value="support">Support</SelectItem>
                 <SelectItem value="mixed">Mixed</SelectItem>
               </SelectContent>
             </Select>
@@ -145,7 +210,7 @@ export function SpendForm({ onResult }: SpendFormProps) {
           {form.tools.map((tool, index) => (
             <div
               key={tool.id}
-              className="grid gap-3 rounded-xl border p-4 md:grid-cols-5"
+              className="grid gap-3 rounded-xl border p-4 md:grid-cols-6"
             >
               <div>
                 <Label>Tool</Label>
@@ -159,9 +224,9 @@ export function SpendForm({ onResult }: SpendFormProps) {
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
-                    {Object.entries(TOOL_LABELS).map(([value, label]) => (
-                      <SelectItem key={value} value={value}>
-                        {label}
+                    {Object.entries(TOOL_PRICING).map(([key, value]) => (
+                      <SelectItem key={key} value={key}>
+                        {value.label}
                       </SelectItem>
                     ))}
                   </SelectContent>
@@ -178,9 +243,9 @@ export function SpendForm({ onResult }: SpendFormProps) {
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
-                    {PRICING[tool.tool].map((p) => (
-                      <SelectItem key={p.plan} value={p.plan}>
-                        {p.plan}
+                    {TOOL_PRICING[tool.tool].plans.map((plan) => (
+                      <SelectItem key={plan.name} value={plan.name}>
+                        {plan.name}
                       </SelectItem>
                     ))}
                   </SelectContent>
@@ -209,6 +274,26 @@ export function SpendForm({ onResult }: SpendFormProps) {
                 />
               </div>
 
+              <div>
+                <Label>Usage</Label>
+                <Select
+                  value={tool.usageIntensity}
+                  onValueChange={(value) =>
+                    updateTool(index, "usageIntensity", value)
+                  }
+                >
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="light">Light</SelectItem>
+                    <SelectItem value="moderate">Moderate</SelectItem>
+                    <SelectItem value="heavy">Heavy</SelectItem>
+                    <SelectItem value="critical">Critical</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+
               <div className="flex items-end">
                 <Button
                   type="button"
@@ -223,13 +308,24 @@ export function SpendForm({ onResult }: SpendFormProps) {
           ))}
         </div>
 
+        {error && (
+          <div className="rounded-lg border border-red-200 bg-red-50 p-3 text-sm text-red-700">
+            {error}
+          </div>
+        )}
+
         <div className="flex flex-col gap-3 sm:flex-row">
           <Button type="button" variant="outline" onClick={addTool}>
             Add another tool
           </Button>
 
-          <Button type="button" onClick={submit} className="sm:ml-auto">
-            Generate audit
+          <Button
+            type="button"
+            onClick={submitAudit}
+            disabled={isSubmitting}
+            className="sm:ml-auto"
+          >
+            {isSubmitting ? "Generating audit..." : "Generate audit"}
           </Button>
         </div>
       </CardContent>

@@ -1,4 +1,29 @@
-export type UseCase = "coding" | "writing" | "data" | "research" | "mixed";
+export type UseCase =
+  | "coding"
+  | "writing"
+  | "data"
+  | "research"
+  | "support"
+  | "mixed";
+
+export type CompanyStage =
+  | "solo"
+  | "pre-seed"
+  | "seed"
+  | "series-a"
+  | "growth"
+  | "agency"
+  | "other";
+
+export type UsageIntensity = "light" | "moderate" | "heavy" | "critical";
+
+export type ToolCategory =
+  | "coding-assistant"
+  | "chat-assistant"
+  | "api"
+  | "research"
+  | "design"
+  | "other";
 
 export type ToolName =
   | "cursor"
@@ -8,7 +33,8 @@ export type ToolName =
   | "anthropic-api"
   | "openai-api"
   | "gemini"
-  | "windsurf";
+  | "windsurf"
+  | "v0";
 
 export interface ToolSpendInput {
   id: string;
@@ -16,24 +42,30 @@ export interface ToolSpendInput {
   plan: string;
   monthlySpend: number;
   seats: number;
+  usageIntensity: UsageIntensity;
 }
 
 export interface AuditInput {
+  companyStage: CompanyStage;
   teamSize: number;
+  engineeringTeamSize: number;
   useCase: UseCase;
   tools: ToolSpendInput[];
 }
 
 export type RecommendationType =
   | "keep"
-  | "downgrade"
   | "reduce-seats"
+  | "downgrade"
   | "consolidate"
   | "credits"
+  | "benchmark-warning"
   | "review";
 
 export interface ToolRecommendation {
   tool: ToolName;
+  toolLabel: string;
+  category: ToolCategory;
   plan: string;
   currentSpend: number;
   recommendedSpend: number;
@@ -46,7 +78,7 @@ export interface ToolRecommendation {
 }
 
 export interface AuditResult {
-  id: string;
+  publicId: string;
   createdAt: string;
   input: AuditInput;
   totalCurrentSpend: number;
@@ -54,6 +86,8 @@ export interface AuditResult {
   totalMonthlySavings: number;
   totalAnnualSavings: number;
   spendPerTeamMember: number;
+  spendPerEngineer: number;
+  efficiencyScore: number;
   segment: "optimized" | "moderate-savings" | "high-savings";
   recommendations: ToolRecommendation[];
   summary: string;

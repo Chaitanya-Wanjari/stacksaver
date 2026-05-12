@@ -5,70 +5,71 @@ import {
   ToolRecommendation,
   ToolSpendInput,
 } from "./types";
-import { getCheapestPaidPlan, getPlanPrice, TOOL_LABELS } from "./pricing";
+import {
+  getCheapestPaidPlan,
+  getPlanPrice,
+  getToolCategory,
+  getToolLabel,
+} from "./pricing";
+import { calculateEfficiencyScore } from "./scoring";
 
-function roundMoney(value: number) {
+function money(value: number) {
   return Math.max(0, Math.round(value));
 }
 
-function hasDuplicateCodingAssistants(input: AuditInput) {
-  const codingTools = input.tools.filter((t) =>
-    ["cursor", "github-copilot", "windsurf"].includes(t.tool)
-  );
-
-  return input.useCase === "coding" && codingTools.length >= 2;
+function countToolsByCategory(input: AuditInput, category: string) {
+  return input.tools.filter((tool) => getToolCategory(tool.tool) === category)
+    .length;
 }
 
 function evaluateTool(
   tool: ToolSpendInput,
   input: AuditInput
 ): ToolRecommendation {
-  const label = TOOL_LABELS[tool.tool];
-  const officialSeatPrice = getPlanPrice(tool.tool, tool.plan);
-  const expectedSpend =
-    officialSeatPrice !== null && officialSeatPrice > 0
-      ? officialSeatPrice * tool.seats
-      : tool.monthlySpend;
+  const label = getToolLabel(tool.tool);
+  const category = getToolCategory(tool.tool);
+  const officialPrice = getPlanPrice(tool.tool, tool.plan);
 
   let recommendedSpend = tool.monthlySpend;
   let action = "Keep current setup";
-  let reason = "Your current spend appears reasonable for this tool and team size.";
+  let reason = "This tool appears reasonable for your team size and use case.";
   let confidence: ToolRecommendation["confidence"] = "medium";
   let type: ToolRecommendation["type"] = "keep";
 
   // Rule 1: unused seats
-  if (tool.seats > input.teamSize && officialSeatPrice && officialSeatPrice > 0) {
+  if (
+    officialPrice !== null &&
+    officialPrice > 0 &&
+    tool.seats > input.teamSize
+  ) {
     const extraSeats = tool.seats - input.teamSize;
-    const savings = extraSeats * officialSeatPrice;
+    const savings = extraSeats * officialPrice;
 
-    recommendedSpend = roundMoney(tool.monthlySpend - savings);
+    recommendedSpend = money(tool.monthlySpend - savings);
     action = `Reduce ${extraSeats} unused ${extraSeats === 1 ? "seat" : "seats"}`;
-    reason = `${label} has more paid seats than your team size. Reducing unused seats is a direct, high-confidence saving.`;
+    reason = `${label} has more paid seats than your total team size. Removing unused seats is a direct, high-confidence saving.`;
     confidence = "high";
     type = "reduce-seats";
   }
 
-  // Rule 2: small team on enterprise/team plan
-  const expensivePlan =
-    tool.plan.toLowerCase().includes("enterprise") ||
+  // Rule 2: small team on heavy plan
+  const heavyPlan =
     tool.plan.toLowerCase().includes("business") ||
     tool.plan.toLowerCase().includes("team") ||
-    tool.plan.toLowerCase().includes("ultra") ||
-    tool.plan.toLowerCase().includes("max");
+    tool.plan.toLowerCase().includes("enterprise") ||
+    tool.plan.toLowerCase().includes("max") ||
+    tool.plan.toLowerCase().includes("ultra");
 
-  if (
-    input.teamSize <= 3 &&
-    expensivePlan &&
-    tool.monthlySpend > 80 &&
-    type === "keep"
-  ) {
+  if (type === "keep" && input.teamSize <= 3 && heavyPlan) {
     const cheapest = getCheapestPaidPlan(tool.tool);
+
     if (cheapest) {
-      const newSpend = cheapest.monthlyPerSeat * Math.max(1, tool.seats);
-      if (newSpend < tool.monthlySpend) {
-        recommendedSpend = roundMoney(newSpend);
-        action = `Review downgrade to ${cheapest.plan}`;
-        reason = `${label} ${tool.plan} may be heavy for a ${input.teamSize}-person team unless you need admin, compliance, or enterprise controls.`;
+      const estimatedSpend = cheapest.monthlyPerSeat * tool.seats;
+
+      if (estimatedSpend < tool.monthlySpend) {
+        recommendedSpend = money(estimatedSpend);
+        action = `Review downgrade to ${cheapest.name}`;
+        reason = `${label} ${tool.plan} may be more than a ${input.teamSize}-person team needs unless admin, compliance, or collaboration controls are required.`;
         confidence = "medium";
         type = "downgrade";
       }
@@ -77,38 +78,58 @@ function evaluateTool(
 
   // Rule 3: duplicate coding assistants
   if (
-    hasDuplicateCodingAssistants(input) &&
-    ["github-copilot", "windsurf"].includes(tool.tool) &&
-    type === "keep"
+    type === "keep" &&
+    category === "coding-assistant" &&
+    countToolsByCategory(input, "coding-assistant") >= 2 &&
+    tool.usageIntensity !== "critical"
   ) {
     recommendedSpend = 0;
-    action = `Consolidate coding assistants`;
-    reason = `Your stack includes multiple coding assistants. For a small team, standardizing on one primary coding assistant can reduce duplicate spend.`;
+    action = "Consolidate coding assistants";
+    reason =
+      "Your stack includes multiple coding assistants. Most small teams should standardize on one primary coding assistant unless each has a clearly separate workflow.";
     confidence = "medium";
     type = "consolidate";
   }
 
-  // Rule 4: retail credit opportunity for high API spend
+  // Rule 4: duplicate chat assistants
   if (
-    ["openai-api", "anthropic-api", "gemini"].includes(tool.tool) &&
-    tool.monthlySpend >= 500 &&
-    type === "keep"
+    type === "keep" &&
+    category === "chat-assistant" &&
+    countToolsByCategory(input, "chat-assistant") >= 3 &&
+    tool.usageIntensity === "light"
+  ) {
+    recommendedSpend = 0;
+    action = "Remove lightly used overlapping assistant";
+    reason =
+      "You have several general-purpose AI assistants. Lightly used overlapping subscriptions are strong candidates for cancellation.";
+    confidence = "medium";
+    type = "consolidate";
+  }
+
+  // Rule 5: retail API spend
+  if (
+    type === "keep" &&
+    category === "api" &&
+    tool.monthlySpend >= 500
   ) {
     const estimatedSavings = tool.monthlySpend * 0.2;
-    recommendedSpend = roundMoney(tool.monthlySpend - estimatedSavings);
+    recommendedSpend = money(tool.monthlySpend - estimatedSavings);
     action = "Explore discounted AI credits";
-    reason = `${label} spend is high enough that discounted infrastructure credits could materially reduce retail API cost.`;
+    reason =
+      "This API spend is high enough that discounted infrastructure credits could materially reduce retail AI costs.";
     confidence = "low";
     type = "credits";
   }
 
-  const monthlySavings = roundMoney(tool.monthlySpend - recommendedSpend);
+  const monthlySavings = money(tool.monthlySpend - recommendedSpend);
 
   return {
     tool: tool.tool,
+    toolLabel: label,
+    category,
     plan: tool.plan,
-    currentSpend: roundMoney(tool.monthlySpend),
-    recommendedSpend: roundMoney(recommendedSpend),
+    currentSpend: money(tool.monthlySpend),
+    recommendedSpend: money(recommendedSpend),
     monthlySavings,
     annualSavings: monthlySavings * 12,
     action,
@@ -120,41 +141,55 @@ function evaluateTool(
 
 export function buildFallbackSummary(result: Omit<AuditResult, "summary">) {
   if (result.totalMonthlySavings >= 500) {
-    return `Your AI stack shows a significant savings opportunity of $${result.totalMonthlySavings}/month, or $${result.totalAnnualSavings}/year. The largest opportunities come from duplicate tools, plan fit, unused seats, or retail API spend. Because the savings are material, this is a strong case for reviewing discounted AI credits and consolidating your stack before the next billing cycle.`;
+    return `Your AI stack shows a significant savings opportunity of $${result.totalMonthlySavings}/month, or $${result.totalAnnualSavings}/year. The biggest opportunities come from unused seats, overlapping tools, plan mismatch, or high retail API spend. Because the savings are material, this stack is worth reviewing before the next billing cycle.`;
   }
 
   if (result.totalMonthlySavings < 100) {
-    return `Your AI spend appears relatively lean for your team size and use case. The audit did not find major savings without risking productivity. The best next step is to keep monitoring pricing changes, seat usage, and whether new tools are duplicating capabilities you already pay for.`;
+    return `Your AI spend appears relatively lean for your team size and use case. The audit did not find major savings without risking productivity. The best next step is to keep monitoring seat usage, pricing changes, and whether new tools duplicate capabilities you already pay for.`;
   }
 
-  return `Your AI stack has a moderate savings opportunity of $${result.totalMonthlySavings}/month, or $${result.totalAnnualSavings}/year. The recommendations focus on practical changes such as right-sizing seats, reviewing plan fit, and avoiding overlapping tools. These changes can reduce spend while keeping the team’s core AI workflows intact.`;
+  return `Your AI stack has a moderate savings opportunity of $${result.totalMonthlySavings}/month, or $${result.totalAnnualSavings}/year. The recommendations focus on practical changes such as reducing unused seats, reviewing plan fit, and consolidating overlapping tools while preserving the team’s core workflows.`;
 }
 
 export function runAudit(input: AuditInput): AuditResult {
   const recommendations = input.tools.map((tool) => evaluateTool(tool, input));
 
-  const totalCurrentSpend = roundMoney(
+  const totalCurrentSpend = money(
     input.tools.reduce((sum, tool) => sum + Number(tool.monthlySpend || 0), 0)
   );
 
-  const totalRecommendedSpend = roundMoney(
+  const totalRecommendedSpend = money(
     recommendations.reduce((sum, rec) => sum + rec.recommendedSpend, 0)
   );
 
-  const totalMonthlySavings = roundMoney(totalCurrentSpend - totalRecommendedSpend);
+  const totalMonthlySavings = money(totalCurrentSpend - totalRecommendedSpend);
   const totalAnnualSavings = totalMonthlySavings * 12;
 
+  const spendPerTeamMember = input.teamSize
+    ? money(totalCurrentSpend / input.teamSize)
+    : totalCurrentSpend;
+
+  const spendPerEngineer = input.engineeringTeamSize
+    ? money(totalCurrentSpend / input.engineeringTeamSize)
+    : spendPerTeamMember;
+
+  const efficiencyScore = calculateEfficiencyScore(
+    input,
+    recommendations,
+    spendPerEngineer
+  );
+
   const base = {
-    id: nanoid(10),
+    publicId: `aud_${nanoid(10)}`,
     createdAt: new Date().toISOString(),
     input,
     totalCurrentSpend,
     totalRecommendedSpend,
     totalMonthlySavings,
     totalAnnualSavings,
-    spendPerTeamMember: input.teamSize
-      ? roundMoney(totalCurrentSpend / input.teamSize)
-      : totalCurrentSpend,
+    spendPerTeamMember,
+    spendPerEngineer,
+    efficiencyScore,
     segment:
       totalMonthlySavings >= 500
         ? "high-savings"

@@ -19,6 +19,8 @@ import {
 
 const STORAGE_KEY = "stacksaver-audit-draft";
 
+const fieldLabelClass = "mb-2 block text-sm font-medium";
+
 const defaultInput: AuditInput = {
   companyStage: "seed",
   teamSize: 8,
@@ -128,22 +130,22 @@ export function SpendForm() {
   }
 
   return (
-    <Card className="border shadow-sm">
+    <Card className="border bg-card text-card-foreground shadow-sm">
       <CardHeader>
         <CardTitle>Run your AI spend audit</CardTitle>
       </CardHeader>
 
       <CardContent className="space-y-6">
-        <div className="grid gap-4 md:grid-cols-4">
+        <div className="grid gap-5 md:grid-cols-4">
           <div>
-            <Label>Company stage</Label>
+            <Label className={fieldLabelClass}>Company stage</Label>
             <Select
               value={form.companyStage}
               onValueChange={(value) =>
                 setForm({ ...form, companyStage: value as CompanyStage })
               }
             >
-              <SelectTrigger>
+              <SelectTrigger className="h-10">
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
@@ -159,8 +161,9 @@ export function SpendForm() {
           </div>
 
           <div>
-            <Label>Total team size</Label>
+            <Label className={fieldLabelClass}>Total team size</Label>
             <Input
+              className="h-10"
               type="number"
               value={form.teamSize}
               onChange={(e) =>
@@ -170,8 +173,9 @@ export function SpendForm() {
           </div>
 
           <div>
-            <Label>Engineering team size</Label>
+            <Label className={fieldLabelClass}>Engineering team size</Label>
             <Input
+              className="h-10"
               type="number"
               value={form.engineeringTeamSize}
               onChange={(e) =>
@@ -184,14 +188,14 @@ export function SpendForm() {
           </div>
 
           <div>
-            <Label>Primary use case</Label>
+            <Label className={fieldLabelClass}>Primary use case</Label>
             <Select
               value={form.useCase}
               onValueChange={(value) =>
                 setForm({ ...form, useCase: value as UseCase })
               }
             >
-              <SelectTrigger>
+              <SelectTrigger className="h-10">
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
@@ -210,17 +214,17 @@ export function SpendForm() {
           {form.tools.map((tool, index) => (
             <div
               key={tool.id}
-              className="grid gap-3 rounded-xl border p-4 md:grid-cols-6"
+              className="grid gap-5 rounded-2xl border bg-muted/20 p-4 md:grid-cols-6"
             >
               <div>
-                <Label>Tool</Label>
+                <Label className={fieldLabelClass}>Tool</Label>
                 <Select
                   value={tool.tool}
                   onValueChange={(value) =>
                     updateTool(index, "tool", value as ToolName)
                   }
                 >
-                  <SelectTrigger>
+                  <SelectTrigger className="h-10">
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
@@ -234,12 +238,12 @@ export function SpendForm() {
               </div>
 
               <div>
-                <Label>Plan</Label>
+                <Label className={fieldLabelClass}>Plan</Label>
                 <Select
                   value={tool.plan}
                   onValueChange={(value) => updateTool(index, "plan", value)}
                 >
-                  <SelectTrigger>
+                  <SelectTrigger className="h-10">
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
@@ -253,8 +257,9 @@ export function SpendForm() {
               </div>
 
               <div>
-                <Label>Monthly spend</Label>
+                <Label className={fieldLabelClass}>Monthly spend</Label>
                 <Input
+                  className="h-10"
                   type="number"
                   value={tool.monthlySpend}
                   onChange={(e) =>
@@ -264,8 +269,9 @@ export function SpendForm() {
               </div>
 
               <div>
-                <Label>Seats</Label>
+                <Label className={fieldLabelClass}>Seats</Label>
                 <Input
+                  className="h-10"
                   type="number"
                   value={tool.seats}
                   onChange={(e) =>
@@ -275,14 +281,14 @@ export function SpendForm() {
               </div>
 
               <div>
-                <Label>Usage</Label>
+                <Label className={fieldLabelClass}>Usage</Label>
                 <Select
                   value={tool.usageIntensity}
                   onValueChange={(value) =>
                     updateTool(index, "usageIntensity", value)
                   }
                 >
-                  <SelectTrigger>
+                  <SelectTrigger className="h-10">
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
@@ -299,7 +305,7 @@ export function SpendForm() {
                   type="button"
                   variant="outline"
                   onClick={() => removeTool(index)}
-                  className="w-full"
+                  className="h-10 w-full"
                 >
                   Remove
                 </Button>
@@ -309,7 +315,7 @@ export function SpendForm() {
         </div>
 
         {error && (
-          <div className="rounded-lg border border-red-200 bg-red-50 p-3 text-sm text-red-700">
+          <div className="rounded-lg border border-red-200 bg-red-50 p-3 text-sm text-red-700 dark:border-red-900/50 dark:bg-red-950/30 dark:text-red-300">
             {error}
           </div>
         )}

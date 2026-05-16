@@ -14,6 +14,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { LeadCaptureForm } from "./LeadCaptureForm";
+import { PdfExportButton } from "./PdfExportButton";
 
 export function AuditResults({ result }: { result: AuditResult }) {
   const publicUrl =
@@ -145,6 +146,7 @@ export function AuditResults({ result }: { result: AuditResult }) {
                 Open public report
               </a>
             </Button>
+            <PdfExportButton result={result} />
           </div>
         </CardContent>
       </Card>

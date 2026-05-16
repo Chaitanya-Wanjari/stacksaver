@@ -2,43 +2,48 @@ name: CI
 
 on:
   push:
-    branches: [main, master]
+    branches:
+      - master
+      - main
   pull_request:
-    branches: [main, master]
+    branches:
+      - master
+      - main
 
 jobs:
-  quality:
+  lint-test-build:
     runs-on: ubuntu-latest
 
     env:
-      NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
-      NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY }}
-      SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
-      RESEND_API_KEY: ${{ secrets.RESEND_API_KEY }}
       NEXT_PUBLIC_APP_URL: http://localhost:3000
-      ADMIN_PASSWORD: test-password
+      NEXT_PUBLIC_SUPABASE_URL: https://example.supabase.co
+      NEXT_PUBLIC_SUPABASE_ANON_KEY: dummy
+      SUPABASE_SERVICE_ROLE_KEY: dummy
+      RESEND_API_KEY: dummy
+      ADMIN_PASSWORD: dummy
+      LLM_API_KEY: dummy
 
     steps:
-      - name: Checkout
+      - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Setup Node
+      - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: 20
           cache: npm
 
-      - name: Install
+      - name: Install dependencies
         run: npm ci
 
-      - name: Lint
+      - name: Run lint
         run: npm run lint
 
-      - name: Typecheck
-        run: npm run typecheck
-
-      - name: Test
+      - name: Run tests
         run: npm test
+
+      - name: Run typecheck
+        run: npm run typecheck
 
       - name: Build
         run: npm run build

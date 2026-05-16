@@ -91,4 +91,5 @@ export interface AuditResult {
   segment: "optimized" | "moderate-savings" | "high-savings";
   recommendations: ToolRecommendation[];
   summary: string;
+  personalizedSummary?: string;
 }

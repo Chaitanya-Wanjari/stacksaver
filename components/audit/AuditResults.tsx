@@ -99,7 +99,7 @@ export function AuditResults({ result }: { result: AuditResult }) {
               Audit summary
             </div>
             <p className="text-sm leading-7 text-muted-foreground">
-              {result.summary}
+              {result.personalizedSummary || result.summary}
             </p>
           </div>
 

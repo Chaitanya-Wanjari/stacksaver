@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { runAudit } from "@/lib/audit/engine";
 import { saveAudit } from "@/lib/db/audits";
 import { auditInputSchema } from "@/lib/validation/schemas";
+import { generatePersonalizedSummary } from "@/lib/ai/summary";
 
 export async function POST(req: Request) {
   try {
@@ -9,12 +10,20 @@ export async function POST(req: Request) {
     const input = auditInputSchema.parse(body);
 
     const result = runAudit(input);
-    await saveAudit(result);
+
+    const personalizedSummary = await generatePersonalizedSummary(result);
+
+    const resultWithSummary = {
+      ...result,
+      personalizedSummary,
+    };
+
+    await saveAudit(resultWithSummary);
 
     return NextResponse.json({
       ok: true,
-      publicId: result.publicId,
-      result,
+      publicId: resultWithSummary.publicId,
+      result: resultWithSummary,
     });
   } catch (error) {
     console.error(error);

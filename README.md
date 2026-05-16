@@ -432,22 +432,3 @@ Future improvements can include:
 * Role-based admin access
 * Custom domain deployment
 
-## Resume Highlights
-
-This project demonstrates:
-
-* Full-stack application development with Next.js
-* Database integration using Supabase
-* Server-side API design
-* Email integration using Resend
-* Product-oriented UI design
-* Environment-based configuration
-* Public report generation
-* Lead capture workflow
-* Dark mode implementation
-* Git-based development workflow with meaningful commits
-
-
-## License
-
-This project is for assignment and portfolio purposes. Add a license if you plan to make it open source.

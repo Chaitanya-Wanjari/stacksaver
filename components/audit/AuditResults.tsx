@@ -75,29 +75,49 @@ export function AuditResults({ result }: { result: AuditResult }) {
             </div>
           </div>
 
-          <div className="grid gap-3 md:grid-cols-3">
-            <Metric
-              icon={<DollarSign className="size-4" />}
-              label="Current spend"
-              value={`$${result.totalCurrentSpend}/mo`}
-            />
-            <Metric
-              icon={<TrendingDown className="size-4" />}
-              label="Recommended spend"
-              value={`$${result.totalRecommendedSpend}/mo`}
-            />
-            <Metric
-              icon={<Gauge className="size-4" />}
-              label="Spend per engineer"
-              value={`$${result.spendPerEngineer}/mo`}
-            />
-          </div>
+          <div className="grid gap-3 md:grid-cols-4">
+  <Metric
+    icon={<DollarSign className="size-4" />}
+    label="Current spend"
+    value={`$${result.totalCurrentSpend}/mo`}
+  />
+  <Metric
+    icon={<TrendingDown className="size-4" />}
+    label="Recommended spend"
+    value={`$${result.totalRecommendedSpend}/mo`}
+  />
+  <Metric
+    icon={<Gauge className="size-4" />}
+    label="Spend per engineer"
+    value={`$${result.spendPerEngineer}/mo`}
+  />
+  <Metric
+    icon={<Gauge className="size-4" />}
+    label="Benchmark"
+    value={`$${result.benchmarkSpendPerEngineer}/engineer`}
+  />
+</div>
 
-          <div className="rounded-3xl border bg-muted/40 p-5">
-            <div className="mb-2 flex items-center gap-2 font-medium">
-              <CheckCircle2 className="size-5" />
-              Audit summary
-            </div>
+<div className="rounded-3xl border bg-muted/40 p-5">
+  <h3 className="font-semibold">Benchmark mode</h3>
+  <p className="mt-2 text-sm leading-6 text-muted-foreground">
+    Your AI spend is ${result.spendPerEngineer}/engineer/month. Similar teams
+    are estimated at around ${result.benchmarkSpendPerEngineer}/engineer/month.
+    {result.benchmarkDelta > 0
+      ? ` You are currently $${result.benchmarkDelta}/engineer/month above benchmark.`
+      : result.benchmarkDelta < 0
+        ? ` You are currently $${Math.abs(
+            result.benchmarkDelta
+          )}/engineer/month below benchmark.`
+        : " You are currently aligned with the benchmark range."}
+  </p>
+</div>
+
+<div className="rounded-3xl border bg-muted/40 p-5">
+  <div className="mb-2 flex items-center gap-2 font-medium">
+    <CheckCircle2 className="size-5" />
+    Audit summary
+  </div>
             <p className="text-sm leading-7 text-muted-foreground">
               {result.personalizedSummary || result.summary}
             </p>

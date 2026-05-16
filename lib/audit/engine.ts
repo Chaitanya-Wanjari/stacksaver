@@ -22,6 +22,13 @@ function countToolsByCategory(input: AuditInput, category: string) {
     .length;
 }
 
+function getBenchmarkSpendPerEngineer(teamSize: number) {
+  if (teamSize <= 5) return 120;
+  if (teamSize <= 15) return 180;
+  if (teamSize <= 50) return 240;
+  return 300;
+}
+
 function evaluateTool(
   tool: ToolSpendInput,
   input: AuditInput
@@ -165,19 +172,24 @@ export function runAudit(input: AuditInput): AuditResult {
   const totalMonthlySavings = money(totalCurrentSpend - totalRecommendedSpend);
   const totalAnnualSavings = totalMonthlySavings * 12;
 
-  const spendPerTeamMember = input.teamSize
-    ? money(totalCurrentSpend / input.teamSize)
-    : totalCurrentSpend;
+ const spendPerTeamMember = input.teamSize
+  ? money(totalCurrentSpend / input.teamSize)
+  : totalCurrentSpend;
 
-  const spendPerEngineer = input.engineeringTeamSize
-    ? money(totalCurrentSpend / input.engineeringTeamSize)
-    : spendPerTeamMember;
+const spendPerEngineer = input.engineeringTeamSize
+  ? money(totalCurrentSpend / input.engineeringTeamSize)
+  : spendPerTeamMember;
 
-  const efficiencyScore = calculateEfficiencyScore(
-    input,
-    recommendations,
-    spendPerEngineer
-  );
+const benchmarkSpendPerEngineer = getBenchmarkSpendPerEngineer(input.teamSize);
+const benchmarkDelta = Math.round(
+  spendPerEngineer - benchmarkSpendPerEngineer
+);
+
+const efficiencyScore = calculateEfficiencyScore(
+  input,
+  recommendations,
+  spendPerEngineer
+);
 
   const base = {
     publicId: `aud_${nanoid(10)}`,
@@ -189,6 +201,8 @@ export function runAudit(input: AuditInput): AuditResult {
     totalAnnualSavings,
     spendPerTeamMember,
     spendPerEngineer,
+    benchmarkSpendPerEngineer,
+    benchmarkDelta,
     efficiencyScore,
     segment:
       totalMonthlySavings >= 500

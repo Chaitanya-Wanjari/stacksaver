@@ -87,6 +87,8 @@ export interface AuditResult {
   totalAnnualSavings: number;
   spendPerTeamMember: number;
   spendPerEngineer: number;
+  benchmarkSpendPerEngineer: number;
+  benchmarkDelta: number;
   efficiencyScore: number;
   segment: "optimized" | "moderate-savings" | "high-savings";
   recommendations: ToolRecommendation[];

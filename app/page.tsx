@@ -27,9 +27,9 @@ const supportedTools = [
 
 export default function Home() {
   return (
-    <main className="min-h-screen overflow-hidden">
+    <main className="min-h-screen overflow-hidden bg-background text-foreground">
       <section className="mx-auto max-w-7xl px-4 py-6 md:py-8">
-        <nav className="flex items-center justify-between rounded-2xl border bg-background/70 px-4 py-3 shadow-sm backdrop-blur">
+        <nav className="flex items-center justify-between rounded-2xl border bg-card/80 px-4 py-3 text-card-foreground shadow-sm backdrop-blur">
           <a href="/" className="flex items-center gap-2 font-bold">
             <span className="flex size-8 items-center justify-center rounded-xl bg-foreground text-background">
               S
@@ -38,30 +38,33 @@ export default function Home() {
           </a>
 
           <div className="hidden items-center gap-6 text-sm text-muted-foreground md:flex">
-            <a href="#features" className="hover:text-foreground">
+            <a href="#features" className="transition hover:text-foreground">
               Features
             </a>
-            <a href="#how-it-works" className="hover:text-foreground">
+            <a
+              href="#how-it-works"
+              className="transition hover:text-foreground"
+            >
               How it works
             </a>
-            <a href="#tools" className="hover:text-foreground">
+            <a href="#tools" className="transition hover:text-foreground">
               Tools
             </a>
           </div>
 
           <div className="flex items-center gap-2">
-  <ThemeToggle />
-  <Button asChild>
-    <a href="/audit/new">
-      Run free audit <ArrowRight className="ml-2 size-4" />
-    </a>
-  </Button>
-</div>
+            <ThemeToggle />
+            <Button asChild>
+              <a href="/audit/new">
+                Run free audit <ArrowRight className="ml-2 size-4" />
+              </a>
+            </Button>
+          </div>
         </nav>
 
         <div className="grid gap-10 py-16 md:grid-cols-[1.05fr_0.95fr] md:items-center md:py-24">
           <div>
-            <div className="mb-5 inline-flex items-center gap-2 rounded-full border bg-background/70 px-3 py-1 text-sm text-muted-foreground shadow-sm backdrop-blur">
+            <div className="mb-5 inline-flex items-center gap-2 rounded-full border bg-card/80 px-3 py-1 text-sm text-muted-foreground shadow-sm backdrop-blur">
               <Sparkles className="size-4" />
               AI spend audit for startup teams
             </div>
@@ -89,23 +92,34 @@ export default function Home() {
             </div>
 
             <div className="mt-8 grid gap-3 text-sm text-muted-foreground sm:grid-cols-3">
-              <TrustItem icon={<ShieldCheck className="size-4" />} text="No signup required" />
-              <TrustItem icon={<Lock className="size-4" />} text="Public report links" />
-              <TrustItem icon={<Zap className="size-4" />} text="Results in minutes" />
+              <TrustItem
+                icon={<ShieldCheck className="size-4" />}
+                text="No signup required"
+              />
+              <TrustItem
+                icon={<Lock className="size-4" />}
+                text="Public report links"
+              />
+              <TrustItem
+                icon={<Zap className="size-4" />}
+                text="Results in minutes"
+              />
             </div>
           </div>
 
-          <Card className="relative overflow-hidden border shadow-xl">
+          <Card className="relative overflow-hidden border bg-card text-card-foreground shadow-xl">
             <div className="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-indigo-500 via-sky-500 to-emerald-500" />
+
             <CardContent className="space-y-6 p-6 md:p-8">
-              <div className="flex items-center justify-between">
+              <div className="flex items-center justify-between gap-4">
                 <div>
                   <p className="text-sm text-muted-foreground">
                     Example audit
                   </p>
                   <h2 className="mt-1 text-2xl font-bold">Seed-stage SaaS</h2>
                 </div>
-                <div className="rounded-full bg-emerald-50 px-3 py-1 text-sm font-medium text-emerald-700">
+
+                <div className="rounded-full border border-emerald-500/20 bg-emerald-500/10 px-3 py-1 text-sm font-medium text-emerald-600 dark:text-emerald-400">
                   High savings
                 </div>
               </div>
@@ -166,7 +180,7 @@ export default function Home() {
 
         <section
           id="how-it-works"
-          className="mt-20 rounded-3xl border bg-background/70 p-6 shadow-sm backdrop-blur md:p-10"
+          className="mt-20 rounded-3xl border bg-card p-6 text-card-foreground shadow-sm md:p-10"
         >
           <div className="max-w-2xl">
             <p className="text-sm font-medium text-muted-foreground">
@@ -197,9 +211,9 @@ export default function Home() {
         </section>
 
         <section id="tools" className="mt-20 pb-16">
-          <div className="rounded-3xl border bg-foreground p-8 text-background md:p-10">
+          <div className="rounded-3xl border bg-card p-8 text-card-foreground shadow-sm md:p-10">
             <h2 className="text-3xl font-bold">Supported tools</h2>
-            <p className="mt-2 max-w-2xl text-background/70">
+            <p className="mt-2 max-w-2xl text-muted-foreground">
               StackSaver supports the AI tools most startup teams already pay
               for.
             </p>
@@ -208,7 +222,7 @@ export default function Home() {
               {supportedTools.map((tool) => (
                 <span
                   key={tool}
-                  className="rounded-full border border-background/15 bg-background/10 px-4 py-2 text-sm"
+                  className="rounded-full border bg-muted px-4 py-2 text-sm text-foreground"
                 >
                   {tool}
                 </span>
@@ -251,7 +265,10 @@ function AuditPreviewItem({
         <p className="font-medium">{title}</p>
         <p className="text-sm text-muted-foreground">{text}</p>
       </div>
-      <p className="font-semibold text-emerald-600">{value}</p>
+
+      <p className="font-semibold text-emerald-600 dark:text-emerald-400">
+        {value}
+      </p>
     </div>
   );
 }
@@ -266,8 +283,8 @@ function Feature({
   text: string;
 }) {
   return (
-    <div className="rounded-3xl border bg-background/70 p-6 shadow-sm backdrop-blur">
-      <div className="mb-5 flex size-11 items-center justify-center rounded-2xl bg-muted">
+    <div className="rounded-3xl border bg-card p-6 text-card-foreground shadow-sm">
+      <div className="mb-5 flex size-11 items-center justify-center rounded-2xl bg-muted text-foreground">
         {icon}
       </div>
       <h3 className="text-lg font-semibold">{title}</h3>
@@ -286,7 +303,7 @@ function Step({
   text: string;
 }) {
   return (
-    <div className="rounded-2xl border bg-muted/30 p-5">
+    <div className="rounded-2xl border bg-muted/40 p-5">
       <p className="text-sm font-semibold text-muted-foreground">{number}</p>
       <h3 className="mt-4 font-semibold">{title}</h3>
       <p className="mt-2 text-sm leading-6 text-muted-foreground">{text}</p>

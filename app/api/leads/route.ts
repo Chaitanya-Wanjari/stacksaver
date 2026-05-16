@@ -4,6 +4,7 @@ import { getAuditByPublicId } from "@/lib/db/audits";
 import { sendAuditEmail } from "@/lib/email/resend";
 import { leadSchema } from "@/lib/validation/schemas";
 import { AuditResult } from "@/lib/audit/types";
+import { checkRateLimit } from "@/lib/rate-limit/memory";
 
 export async function POST(req: Request) {
   try {
@@ -13,6 +14,24 @@ export async function POST(req: Request) {
     // Honeypot: silently accept bot submissions
     if (input.website) {
       return NextResponse.json({ ok: true });
+    }
+
+    // Basic abuse protection: limit lead submissions per IP
+    const ip =
+      req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ||
+      req.headers.get("x-real-ip") ||
+      "unknown";
+
+    const rateLimit = checkRateLimit(`lead:${ip}`, 5, 60_000);
+
+    if (!rateLimit.allowed) {
+      return NextResponse.json(
+        {
+          ok: false,
+          error: "Too many requests. Please try again later.",
+        },
+        { status: 429 }
+      );
     }
 
     const audit = await getAuditByPublicId(input.publicId);

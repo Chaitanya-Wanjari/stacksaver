@@ -28,6 +28,7 @@ export function AuditResults({ result }: { result: AuditResult }) {
 
   const isHighSavings = result.segment === "high-savings";
   const isOptimized = result.segment === "optimized";
+  const referralCode = `REF-${result.publicId.replace("aud_", "").slice(0, 8).toUpperCase()}`;
 
   return (
     <div className="space-y-6">
@@ -123,7 +124,16 @@ export function AuditResults({ result }: { result: AuditResult }) {
               {result.personalizedSummary || result.summary}
             </p>
           </div>
-
+<div className="rounded-3xl border bg-muted/40 p-5">
+  <h3 className="font-semibold">Referral code</h3>
+  <p className="mt-2 text-sm text-muted-foreground">
+    Share this audit with another founder. If they use your code, both teams can
+    receive a future optimization perk.
+  </p>
+  <div className="mt-3 rounded-xl border bg-background px-3 py-2 font-mono text-sm">
+    {referralCode}
+  </div>
+</div>
           {isHighSavings && (
             <div className="rounded-3xl border border-emerald-200 bg-emerald-50 p-5 text-emerald-950">
               <h3 className="font-semibold">Credit review recommended</h3>

@@ -40,23 +40,29 @@ const defaultInput: AuditInput = {
 
 export function SpendForm() {
   const router = useRouter();
-  const [form, setForm] = useState<AuditInput>(defaultInput);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState("");
 
-  useEffect(() => {
-    const saved = localStorage.getItem(STORAGE_KEY);
-    if (saved) {
-      try {
-        setForm(JSON.parse(saved));
-      } catch {
-        setForm(defaultInput);
-      }
-    }
-  }, []);
+  const [form, setForm] = useState<AuditInput>(() => {
+  if (typeof window === "undefined") {
+    return defaultInput;
+  }
+
+  const saved = window.localStorage.getItem(STORAGE_KEY);
+
+  if (!saved) {
+    return defaultInput;
+  }
+
+  try {
+    return JSON.parse(saved) as AuditInput;
+  } catch {
+    return defaultInput;
+  }
+});
 
   useEffect(() => {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(form));
+    window.localStorage.setItem(STORAGE_KEY, JSON.stringify(form));
   }, [form]);
 
   function updateTool(index: number, key: string, value: string | number) {

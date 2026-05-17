@@ -2,35 +2,24 @@
 
 import { Moon, Sun } from "lucide-react";
 import { useTheme } from "next-themes";
-import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 
 export function ThemeToggle() {
-  const { theme, setTheme } = useTheme();
-  const [mounted, setMounted] = useState(false);
-
-  useEffect(() => {
-    setMounted(true);
-  }, []);
-
-  if (!mounted) {
-    return (
-      <Button variant="outline" size="icon" aria-label="Toggle theme">
-        <Sun className="size-4" />
-      </Button>
-    );
-  }
-
-  const isDark = theme === "dark";
+  const { resolvedTheme, setTheme } = useTheme();
+  const isDark = resolvedTheme === "dark";
 
   return (
     <Button
+      type="button"
       variant="outline"
       size="icon"
       aria-label="Toggle theme"
+      suppressHydrationWarning
       onClick={() => setTheme(isDark ? "light" : "dark")}
     >
-      {isDark ? <Sun className="size-4" /> : <Moon className="size-4" />}
+      <span suppressHydrationWarning>
+        {isDark ? <Sun className="size-4" /> : <Moon className="size-4" />}
+      </span>
     </Button>
   );
 }

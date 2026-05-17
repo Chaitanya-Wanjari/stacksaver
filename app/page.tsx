@@ -1,7 +1,6 @@
 import {
   ArrowRight,
   BarChart3,
-  CheckCircle2,
   Lock,
   Mail,
   ShieldCheck,
@@ -12,6 +11,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { ThemeToggle } from "@/components/theme-toggle";
+import Link from "next/link";
 
 const supportedTools = [
   "Cursor",
@@ -30,12 +30,12 @@ export default function Home() {
     <main className="min-h-screen overflow-hidden bg-background text-foreground">
       <section className="mx-auto max-w-7xl px-4 py-6 md:py-8">
         <nav className="flex items-center justify-between rounded-2xl border bg-card/80 px-4 py-3 text-card-foreground shadow-sm backdrop-blur">
-          <a href="/" className="flex items-center gap-2 font-bold">
-            <span className="flex size-8 items-center justify-center rounded-xl bg-foreground text-background">
-              S
-            </span>
-            StackSaver
-          </a>
+          <Link href="/" className="flex items-center gap-2 font-bold">
+  <span className="flex size-8 items-center justify-center rounded-xl bg-foreground text-background">
+    S
+  </span>
+  StackSaver
+</Link>
 
           <div className="hidden items-center gap-6 text-sm text-muted-foreground md:flex">
             <a href="#features" className="transition hover:text-foreground">
@@ -55,9 +55,9 @@ export default function Home() {
           <div className="flex items-center gap-2">
             <ThemeToggle />
             <Button asChild>
-              <a href="/audit/new">
+              <Link href="/audit/new">
                 Run free audit <ArrowRight className="ml-2 size-4" />
-              </a>
+              </Link>
             </Button>
           </div>
         </nav>
@@ -80,14 +80,14 @@ export default function Home() {
             </p>
 
             <div className="mt-8 flex flex-col gap-3 sm:flex-row">
-              <Button size="lg" asChild>
-                <a href="/audit/new">
-                  Run free audit <ArrowRight className="ml-2 size-4" />
-                </a>
-              </Button>
+              <Button size='lg' asChild>
+  <Link href="/audit/new">
+    Run free audit <ArrowRight className="ml-2 size-4" />
+  </Link>
+</Button>
 
               <Button size="lg" variant="outline" asChild>
-                <a href="#how-it-works">See how it works</a>
+                <Link href="#how-it-works">See how it works</Link>
               </Button>
             </div>
 

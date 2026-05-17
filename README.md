@@ -19,11 +19,11 @@ https://github.com/Chaitanya-Wanjari/stacksaver
 ```
 
 ## Problem Statement
-
 Modern engineering teams increasingly use multiple AI tools for coding, writing, research, automation, and API-based workflows. As teams grow, AI tool spending can become fragmented across unused seats, duplicate subscriptions, mismatched plans, and high API usage.
 
 StackSaver solves this problem by giving teams a quick, explainable audit of their AI stack. Instead of only tracking expenses, it provides actionable recommendations that help reduce waste while preserving productivity.
 
+The goal is to help startup teams treat AI spend as an optimizable operating expense rather than an unclear monthly bill.
 ## Key Features
 
 ### AI Spend Audit
@@ -416,19 +416,4 @@ stacksaver/
 * Resend API key should be stored only in environment variables.
 * Email sending should use a verified domain in production.
 
-## Production Improvements
-
-Future improvements can include:
-
-* User authentication
-* Organization workspaces
-* Saved audit history
-* CSV export
-* PDF report generation
-* Stripe billing
-* More advanced pricing intelligence
-* AI-generated executive summaries
-* Analytics dashboard
-* Role-based admin access
-* Custom domain deployment
 

@@ -1,4 +1,4 @@
-# StackSaver
+<img width="1717" height="901" alt="image" src="https://github.com/user-attachments/assets/99f3a2ba-1731-4849-8183-3a3a3d1a74c1" /># StackSaver
 
 StackSaver is a full-stack SaaS-style web application that helps startup teams audit their AI tool spending. It analyzes subscriptions and API usage across tools such as Cursor, GitHub Copilot, ChatGPT, Claude, OpenAI API, Gemini, Windsurf, and v0, then generates a shareable report with estimated monthly savings, annual savings, efficiency score, and tool-level recommendations.
 
@@ -6,10 +6,8 @@ The project is designed as a production-oriented assignment submission with a re
 
 ## Live Demo
 
-Add your deployed URL here after deployment:
-
 ```text
-https://your-vercel-app-url.vercel.app
+https://stacksaver-two.vercel.app/
 ```
 
 ## Repository

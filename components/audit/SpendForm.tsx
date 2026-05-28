@@ -127,6 +127,7 @@ export function SpendForm() {
       }
 
       localStorage.removeItem(STORAGE_KEY);
+      console.log(data);
       router.push(`/audit/${data.publicId}`);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Something went wrong");

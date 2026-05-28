@@ -1,5 +1,6 @@
 import { AuditGraphState } from "../state";
-import { model } from "../utils/model";
+import { generateText }
+from "../utils/generate";
 
 export async function benchmarkAgentNode(
   state: AuditGraphState
@@ -26,20 +27,10 @@ Explain:
 - Key efficiency concerns
 `;
 
-  const completion =
-  await model.chat.completions.create({
-    model: "deepseek/deepseek-r1:free",
-
-    messages: [
-      {
-        role: "user",
-        content: prompt,
-      },
-    ],
-  });
+  const response =
+  await generateText(prompt);
 
 return {
-  benchmarkAnalysis:
-    completion.choices[0].message.content || "",
+  benchmarkAnalysis: response,
 };
 }

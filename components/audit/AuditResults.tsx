@@ -16,6 +16,27 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { LeadCaptureForm } from "./LeadCaptureForm";
 import { PdfExportButton } from "./PdfExportButton";
 
+interface AIAnalysis {
+  summary: string;
+
+  opportunities: {
+    title: string;
+    description: string;
+    impact: string;
+    estimatedSavings: number;
+  }[];
+
+  risks: {
+    risk: string;
+    severity: string;
+    mitigation: string;
+  }[];
+
+  priorities: string[];
+
+  confidence: number;
+}
+
 export function AuditResults({ result }: { result: AuditResult }) {
   const publicUrl =
     typeof window !== "undefined"
@@ -29,6 +50,10 @@ export function AuditResults({ result }: { result: AuditResult }) {
   const isHighSavings = result.segment === "high-savings";
   const isOptimized = result.segment === "optimized";
   const referralCode = `REF-${result.publicId.replace("aud_", "").slice(0, 8).toUpperCase()}`;
+
+  const aiAnalysis =
+  (result as any).agentAnalysis
+    ?.spendAnalysis as AIAnalysis;
 
   return (
     <div className="space-y-6">
@@ -134,6 +159,142 @@ export function AuditResults({ result }: { result: AuditResult }) {
     {referralCode}
   </div>
 </div>
+
+{aiAnalysis && (
+  <section className="space-y-6">
+    <div>
+      <p className="text-sm font-medium text-muted-foreground">
+        AI Insights
+      </p>
+
+      <h2 className="mt-1 text-2xl font-bold">
+        Multi-agent spend analysis
+      </h2>
+    </div>
+
+    <div className="grid gap-6 md:grid-cols-2">
+      <div className="rounded-3xl border bg-background p-6 shadow-sm">
+        <h3 className="text-lg font-semibold">
+          Executive Summary
+        </h3>
+
+        <p className="mt-3 text-sm leading-7 text-muted-foreground">
+          {aiAnalysis.summary}
+        </p>
+
+        <div className="mt-5">
+          <p className="text-sm font-medium">
+            Confidence Score
+          </p>
+
+          <div className="mt-2 h-3 overflow-hidden rounded-full bg-muted">
+            <div
+              className="h-full rounded-full bg-foreground transition-all"
+              style={{
+                width: `${
+                  aiAnalysis.confidence * 100
+                }%`,
+              }}
+            />
+          </div>
+
+          <p className="mt-2 text-sm text-muted-foreground">
+            {Math.round(
+              aiAnalysis.confidence * 100
+            )}
+            % confidence
+          </p>
+        </div>
+      </div>
+
+      <div className="rounded-3xl border bg-background p-6 shadow-sm">
+        <h3 className="text-lg font-semibold">
+          Priority Actions
+        </h3>
+
+        <div className="mt-4 space-y-3">
+          {aiAnalysis.priorities.map(
+            (priority, index) => (
+              <div
+                key={index}
+                className="rounded-2xl border bg-muted/40 px-4 py-3 text-sm"
+              >
+                {priority}
+              </div>
+            )
+          )}
+        </div>
+      </div>
+    </div>
+
+    <div>
+      <h3 className="text-xl font-semibold">
+        Savings Opportunities
+      </h3>
+
+      <div className="mt-4 grid gap-4 md:grid-cols-2">
+        {aiAnalysis.opportunities.map(
+          (opportunity, index) => (
+            <div
+              key={index}
+              className="rounded-3xl border bg-background p-5 shadow-sm"
+            >
+              <div className="flex items-center justify-between">
+                <h4 className="font-semibold">
+                  {opportunity.title}
+                </h4>
+
+                <span className="rounded-full border px-2 py-1 text-xs">
+                  {opportunity.impact}
+                </span>
+              </div>
+
+              <p className="mt-3 text-sm leading-6 text-muted-foreground">
+                {opportunity.description}
+              </p>
+
+              <p className="mt-4 text-sm font-medium">
+                Estimated savings:
+                ${opportunity.estimatedSavings}
+              </p>
+            </div>
+          )
+        )}
+      </div>
+    </div>
+
+    <div>
+      <h3 className="text-xl font-semibold">
+        Risk Analysis
+      </h3>
+
+      <div className="mt-4 grid gap-4 md:grid-cols-2">
+        {aiAnalysis.risks.map(
+          (risk, index) => (
+            <div
+              key={index}
+              className="rounded-3xl border bg-background p-5 shadow-sm"
+            >
+              <div className="flex items-center justify-between">
+                <h4 className="font-semibold">
+                  {risk.risk}
+                </h4>
+
+                <span className="rounded-full border px-2 py-1 text-xs">
+                  {risk.severity}
+                </span>
+              </div>
+
+              <p className="mt-3 text-sm leading-6 text-muted-foreground">
+                {risk.mitigation}
+              </p>
+            </div>
+          )
+        )}
+      </div>
+    </div>
+  </section>
+)}
           {isHighSavings && (
             <div className="rounded-3xl border border-emerald-200 bg-emerald-50 p-5 text-emerald-950">
               <h3 className="font-semibold">Credit review recommended</h3>

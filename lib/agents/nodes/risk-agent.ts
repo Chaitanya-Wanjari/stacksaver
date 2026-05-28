@@ -1,5 +1,6 @@
 import { AuditGraphState } from "../state";
-import { model } from "../utils/model";
+import { generateText }
+from "../utils/generate";
 
 export async function riskAgentNode(
   state: AuditGraphState
@@ -32,20 +33,10 @@ Generate:
 3. Which changes require caution
 `;
 
-  const completion =
-  await model.chat.completions.create({
-    model: "deepseek/deepseek-r1:free",
-
-    messages: [
-      {
-        role: "user",
-        content: prompt,
-      },
-    ],
-  });
+  const response =
+  await generateText(prompt);
 
 return {
-  riskAnalysis:
-    completion.choices[0].message.content || "",
+  riskAnalysis: response,
 };
 }

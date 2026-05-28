@@ -69,15 +69,40 @@ ${audit.recommendations
   const raw =
     await generateText(prompt);
 
-  const cleaned =
-  extractJson(raw);
 
-const parsed =
-  SpendAnalysisSchema.parse(
-    JSON.parse(cleaned)
-  );
+console.log(raw);
+
+  try {
+  const cleaned =
+    extractJson(raw);
+
+  const parsed =
+    SpendAnalysisSchema.parse(
+      JSON.parse(cleaned)
+    );
 
   return {
     spendAnalysis: parsed,
   };
+} catch (error) {
+  console.error(
+    "AI parsing failed:",
+    error
+  );
+
+  return {
+    spendAnalysis: {
+      summary:
+        "AI analysis could not be generated.",
+
+      opportunities: [],
+
+      risks: [],
+
+      priorities: [],
+
+      confidence: 0,
+    },
+  };
+} 
 }

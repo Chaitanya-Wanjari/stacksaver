@@ -1,6 +1,5 @@
 import { AuditGraphState } from "../state";
-import { generateText }
-from "../utils/generate";
+import { model } from "../utils/model";
 
 export async function executiveSummaryNode(
   state: AuditGraphState
@@ -29,10 +28,20 @@ Generate:
 - Recommended implementation order
 `;
 
- const response =
-  await generateText(prompt);
+  const completion =
+  await model.chat.completions.create({
+    model: "deepseek/deepseek-r1:free",
+
+    messages: [
+      {
+        role: "user",
+        content: prompt,
+      },
+    ],
+  });
 
 return {
-  executiveSummary: response,
+  executiveSummary:
+    completion.choices[0].message.content || "",
 };
 }

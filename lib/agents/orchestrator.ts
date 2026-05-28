@@ -29,44 +29,30 @@ export async function runAuditOrchestration(
     audit,
   };
 
-  console.time("spendAnalyst");
-
   state = {
     ...state,
     ...(await spendAnalystNode(state)),
   };
 
-  console.timeEnd("spendAnalyst");
+  state = {
+    ...state,
+    ...(await benchmarkAgentNode(state)),
+  };
 
-console.time("parallelAgents");
+  state = {
+    ...state,
+    ...(await consolidationAgentNode(state)),
+  };
 
-const [
-  benchmarkResult,
-  consolidationResult,
-  riskResult,
-] = await Promise.all([
-  benchmarkAgentNode(state),
-  consolidationAgentNode(state),
-  riskAgentNode(state),
-]);
-
-console.timeEnd("parallelAgents");
-
-state = {
-  ...state,
-  ...benchmarkResult,
-  ...consolidationResult,
-  ...riskResult,
-};
-
-  console.time("executiveSummaryAgent");
+  state = {
+    ...state,
+    ...(await riskAgentNode(state)),
+  };
 
   state = {
     ...state,
     ...(await executiveSummaryNode(state)),
   };
-
-  console.timeEnd("executiveSummaryAgent");
 
   return state;
 }

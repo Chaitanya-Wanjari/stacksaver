@@ -5,8 +5,6 @@ import {
 } from "../schemas/analysis";
 
 import type { AgentState } from "../orchestrator";
-import { extractJson }
-from "../utils/extract-json";
 
 export async function spendAnalystNode(
   state: AgentState
@@ -69,40 +67,12 @@ ${audit.recommendations
   const raw =
     await generateText(prompt);
 
-
-console.log(raw);
-
-  try {
-  const cleaned =
-    extractJson(raw);
-
   const parsed =
     SpendAnalysisSchema.parse(
-      JSON.parse(cleaned)
+      JSON.parse(raw)
     );
 
   return {
     spendAnalysis: parsed,
   };
-} catch (error) {
-  console.error(
-    "AI parsing failed:",
-    error
-  );
-
-  return {
-    spendAnalysis: {
-      summary:
-        "AI analysis could not be generated.",
-
-      opportunities: [],
-
-      risks: [],
-
-      priorities: [],
-
-      confidence: 0,
-    },
-  };
-} 
 }

@@ -1,6 +1,5 @@
 import { AuditGraphState } from "../state";
-import { generateText }
-from "../utils/generate";
+import { model } from "../utils/model";
 
 export async function consolidationAgentNode(
   state: AuditGraphState
@@ -31,10 +30,20 @@ Tasks:
 3. Identify risky removals
 4. Explain migration tradeoffs
 `;
-const response =
-  await generateText(prompt);
+const completion =
+  await model.chat.completions.create({
+    model: "deepseek/deepseek-r1:free",
+
+    messages: [
+      {
+        role: "user",
+        content: prompt,
+      },
+    ],
+  });
 
 return {
-  consolidationAnalysis: response,
+  consolidationAnalysis:
+    completion.choices[0].message.content || "",
 };
 }

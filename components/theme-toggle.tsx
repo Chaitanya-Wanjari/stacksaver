@@ -1,12 +1,44 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import { Moon, Sun } from "lucide-react";
-import { useTheme } from "next-themes";
+
 import { Button } from "@/components/ui/button";
 
 export function ThemeToggle() {
-  const { resolvedTheme, setTheme } = useTheme();
-  const isDark = resolvedTheme === "dark";
+  const [mounted, setMounted] = useState(false);
+
+  const [isDark, setIsDark] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+
+    const dark = document.documentElement.classList.contains("dark");
+
+    setIsDark(dark);
+  }, []);
+
+  function toggleTheme() {
+    const root = document.documentElement;
+
+    const nextDark = !isDark;
+
+    setIsDark(nextDark);
+
+    if (nextDark) {
+      root.classList.add("dark");
+    } else {
+      root.classList.remove("dark");
+    }
+  }
+
+  if (!mounted) {
+    return (
+      <Button variant="outline" size="icon" disabled>
+        <div className="size-4" />
+      </Button>
+    );
+  }
 
   return (
     <Button
@@ -14,12 +46,13 @@ export function ThemeToggle() {
       variant="outline"
       size="icon"
       aria-label="Toggle theme"
-      suppressHydrationWarning
-      onClick={() => setTheme(isDark ? "light" : "dark")}
+      onClick={toggleTheme}
     >
-      <span suppressHydrationWarning>
-        {isDark ? <Sun className="size-4" /> : <Moon className="size-4" />}
-      </span>
+      {isDark ? (
+        <Sun className="size-4" />
+      ) : (
+        <Moon className="size-4" />
+      )}
     </Button>
   );
 }

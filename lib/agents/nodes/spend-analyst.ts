@@ -5,6 +5,8 @@ import {
 } from "../schemas/analysis";
 
 import type { AgentState } from "../orchestrator";
+import { extractJson }
+from "../utils/extract-json";
 
 export async function spendAnalystNode(
   state: AgentState
@@ -67,10 +69,13 @@ ${audit.recommendations
   const raw =
     await generateText(prompt);
 
-  const parsed =
-    SpendAnalysisSchema.parse(
-      JSON.parse(raw)
-    );
+  const cleaned =
+  extractJson(raw);
+
+const parsed =
+  SpendAnalysisSchema.parse(
+    JSON.parse(cleaned)
+  );
 
   return {
     spendAnalysis: parsed,

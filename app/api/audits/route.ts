@@ -24,7 +24,9 @@ export async function POST(
 
     const result = runAudit(input);
 
-console.time("runAuditOrchestration");
+
+    console.time("runAuditOrchestration");
+
 
 const agentAnalysis =
   await runAuditOrchestration(result);

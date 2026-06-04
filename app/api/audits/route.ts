@@ -24,15 +24,19 @@ export async function POST(
 
     const result = runAudit(input);
 
-    const agentAnalysis =
-      await runAuditOrchestration(
-        result
-      );
+    console.time("runAuditOrchestration");
 
-    const personalizedSummary =
-      await generatePersonalizedSummary(
-        result
-      );
+const agentAnalysis =
+  await runAuditOrchestration(result);
+
+console.timeEnd("runAuditOrchestration");
+
+console.time("generatePersonalizedSummary");
+
+const personalizedSummary =
+  await generatePersonalizedSummary(result);
+
+console.timeEnd("generatePersonalizedSummary");
 
     const enrichedResult = {
       ...result,

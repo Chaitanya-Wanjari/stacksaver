@@ -9,7 +9,7 @@ The project is designed as a production-oriented assignment submission with a re
 Add your deployed URL here after deployment:
 
 ```text
-https://your-vercel-app-url.vercel.app
+https://stacksaver-two.vercel.app
 ```
 
 ## Repository

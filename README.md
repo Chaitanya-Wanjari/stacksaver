@@ -6,8 +6,6 @@ The project is designed as a production-oriented assignment submission with a re
 
 ## Live Demo
 
-Add your deployed URL here after deployment:
-
 ```text
 https://stacksaver-two.vercel.app
 ```
